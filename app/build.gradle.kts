@@ -1,49 +1,75 @@
+@file:Suppress("UnstableApiUsage", "DSL_SCOPE_VIOLATION")
+
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.plugin)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.kapt)
 }
 
 android {
-    namespace = "com.baims.weathertask"
-    compileSdk = 34
+    namespace = NamceSpace.applicationId
+    compileSdk = ConfigData.compileSdk
+
 
     defaultConfig {
-        applicationId = "com.baims.weathertask"
-        minSdk = 26
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        minSdk = ConfigData.minSdk
+        targetSdk = ConfigData.targetSdk
+        versionCode = ReleaseVersion.versionCode
+        versionName = ReleaseVersion.versionName
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = ConfigData.testRunner
     }
 
+
+
     buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+        getByName(BuildTypeDebug.name) {
+            isMinifyEnabled = BuildTypeDebug.isMinifyEnabled
+            isShrinkResources = BuildTypeDebug.isShrinkResources
+            isDebuggable = BuildTypeDebug.isDebuggable
+        }
+
+        getByName(BuildTypeRelease.name) {
+            isMinifyEnabled = BuildTypeRelease.isMinifyEnabled
+            isShrinkResources = BuildTypeRelease.isShrinkResources
+            isDebuggable = BuildTypeRelease.isDebuggable
+
+          
+        }
+        applicationVariants.all {
+            val variant = this
+            variant.outputs
+                .map { it as com.android.build.gradle.internal.api.BaseVariantOutputImpl }
+                .forEach { output ->
+                    output.outputFileName = createApkName(variant.baseName, variant.versionName)
+                }
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = libs.versions.kotlinJvmTarget.get()
+    }
+    buildFeatures {
+        buildConfig = true
+        viewBinding = true
     }
 }
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.12.0")
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.11.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
-    implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    implementation(libs.bundles.ui)
+    implementation(libs.timber)
+
+    implementation(libs.hilt)
+    kapt(libs.hiltDaggerCompiler)
+
+    //androidTestImplementation(libs.bundles.uiTest)
+    //androidTestImplementation(project(Modules.Core.uiTest))
+
+    //implementation(project(Modules.Features.articles))
+    //implementation(project(Modules.Core.ui))
 }
