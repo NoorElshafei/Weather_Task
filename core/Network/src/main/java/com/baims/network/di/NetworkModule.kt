@@ -1,25 +1,29 @@
 package com.baims.network.di
 
+import android.content.Context
 import com.baims.core.utils.BuildConfig
 import com.baims.network.utils.CacheInterceptor
 import com.baims.network.utils.ForceCacheInterceptor
-import com.baims.network.utils.Network
 import com.baims.utils.config.EnvironmentConfig
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import okhttp3.Cache
 import okhttp3.HttpUrl
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.File
 import java.util.concurrent.TimeUnit
-import javax.inject.Qualifier
 import javax.inject.Singleton
+
+
 private const val REQUEST_TIME_OUT: Long = 60
 
 /**
@@ -46,7 +50,6 @@ class NetworkModule {
             .build()
 
 
-
     @Provides
     @Singleton
     @CitiesApi
@@ -66,18 +69,24 @@ class NetworkModule {
     fun provideOkHttpClient(
         headerInterceptor: Interceptor,
         loggingInterceptor: HttpLoggingInterceptor,
-        ): OkHttpClient {
+        @ApplicationContext context: Context
+    ): OkHttpClient {
         val httpClientBuilder = OkHttpClient.Builder()
         httpClientBuilder.readTimeout(REQUEST_TIME_OUT, TimeUnit.SECONDS)
         httpClientBuilder.connectTimeout(REQUEST_TIME_OUT, TimeUnit.SECONDS)
-        //httpClientBuilder.addInterceptor(headerInterceptor)
-        httpClientBuilder.addInterceptor(ForceCacheInterceptor())
+        httpClientBuilder.addInterceptor(headerInterceptor)
+        val cacheSize = 10 * 1024 * 1024 // 10 MiB
+        val httpCacheDirectory = File(context.cacheDir, "http-cache")
+        val cache = Cache(httpCacheDirectory, cacheSize.toLong())
+        httpClientBuilder.cache(cache)
         httpClientBuilder.addNetworkInterceptor(CacheInterceptor())
+        //  httpClientBuilder.addInterceptor(ForceCacheInterceptor(context))
         if (BuildConfig.DEBUG) {
             httpClientBuilder.addNetworkInterceptor(loggingInterceptor)
         }
         return httpClientBuilder.build()
     }
+
     @Provides
     @Singleton
     fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
