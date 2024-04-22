@@ -2,6 +2,7 @@ package com.baims.utils.config
 
 interface EnvironmentConfig {
 
-    fun getBaseUrl(): String
+    fun getBaseUrlForecast(): String
+    fun getBaseUrlCities(): String
     fun getAppId(): String
 }

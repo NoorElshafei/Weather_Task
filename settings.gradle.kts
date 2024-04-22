@@ -1,9 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 
-include(":core:ui")
-
-
-include(":core:utils")
+include(":core:uiTest")
 
 
 pluginManagement {
@@ -27,4 +24,7 @@ rootProject.name = "Weather Task"
 include(":app")
 include(":core")
 include(":core:Network")
+include(":core:ui")
+include(":core:utils")
+include(":feature:weather")
 

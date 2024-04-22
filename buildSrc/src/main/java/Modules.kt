@@ -4,7 +4,7 @@ object Modules {
 
     object Core {
         private const val core = ":core"
-        const val network = "$core:network"
+        const val network = "$core:Network"
         const val utils = "$core:utils"
         const val ui = "$core:ui"
         const val uiTest = "$core:uiTest"
@@ -12,7 +12,7 @@ object Modules {
 
     object Features {
         private const val feature = ":feature"
-        const val articles = "$feature:forecast"
+        const val weather = "$feature:weather"
     }
 
 }

@@ -65,11 +65,13 @@ dependencies {
     implementation(libs.timber)
 
     implementation(libs.hilt)
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
     kapt(libs.hiltDaggerCompiler)
 
     //androidTestImplementation(libs.bundles.uiTest)
     //androidTestImplementation(project(Modules.Core.uiTest))
 
-    //implementation(project(Modules.Features.articles))
-    //implementation(project(Modules.Core.ui))
+    implementation(project(Modules.Features.weather))
+    implementation(project(Modules.Core.ui))
 }

@@ -12,6 +12,6 @@ object NamceSpace {
 
     object Feature {
         private const val feature = "com.baims.feature"
-        const val articles = "$feature.articles"
+        const val weather = "$feature.weather"
     }
 }

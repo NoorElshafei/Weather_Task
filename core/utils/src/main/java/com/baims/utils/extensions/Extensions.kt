@@ -2,6 +2,7 @@ package com.baims.utils.extensions
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.flow.Flow
@@ -21,6 +22,11 @@ fun <T> Fragment.collect(sharedFlow: SharedFlow<T>, block: (T) -> Unit) {
     }
 }
 
+fun <T> Fragment.observe(liveData: LiveData<T>, block: (T) -> Unit) {
+    liveData.observe(viewLifecycleOwner) {
+        block.invoke(it)
+    }
+}
 
 fun <T> Flow<T>.catchError(action: suspend FlowCollector<T>.(Throwable) -> Unit): Flow<T> =
     catch { error ->
