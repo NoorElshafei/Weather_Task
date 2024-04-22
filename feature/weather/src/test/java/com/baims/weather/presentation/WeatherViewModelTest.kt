@@ -48,6 +48,7 @@ class WeatherViewModelTest {
         runTest {
             coEvery { citiesUseCase.getCities() } answers { flow { emit(expectedCitiesSuccessResult) } }
             val viewModel = WeatherViewModel(citiesUseCase,forecastUseCase)
+            viewModel.getCities()
             viewModel.citiesDataState.test {
                 assertEquals(DataState.Loading, awaitItem())
                 assertEquals(DataState.Success(Mocks.cities), awaitItem())
@@ -63,6 +64,7 @@ class WeatherViewModelTest {
         runTest {
             coEvery { forecastUseCase.getForecast(Mocks.city) } answers { flow { emit(expectedForecastSuccessResult) } }
             val viewModel = WeatherViewModel(citiesUseCase,forecastUseCase)
+            viewModel.getForecast(Mocks.city)
             viewModel.forecastDataState.test {
                 assertEquals(DataState.Loading, awaitItem())
                 assertEquals(DataState.Success(Mocks.forecast), awaitItem())
@@ -77,6 +79,7 @@ class WeatherViewModelTest {
         runTest {
             coEvery { citiesUseCase.getCities() } answers { flow { throw expectedCitiesFailureResult } }
             val viewModel = WeatherViewModel(citiesUseCase,forecastUseCase)
+            viewModel.getCities()
             viewModel.citiesDataState.test {
                 assertEquals(DataState.Loading, awaitItem())
                 assertEquals(DataState.Failure(expectedCitiesFailureResult), awaitItem())
@@ -91,6 +94,7 @@ class WeatherViewModelTest {
         runTest {
             coEvery { forecastUseCase.getForecast(Mocks.city) } answers { flow { throw expectedForecastFailureResult } }
             val viewModel = WeatherViewModel(citiesUseCase,forecastUseCase)
+            viewModel.getForecast(Mocks.city)
             viewModel.forecastDataState.test {
                 assertEquals(DataState.Loading, awaitItem())
                 assertEquals(DataState.Failure(expectedForecastFailureResult), awaitItem())

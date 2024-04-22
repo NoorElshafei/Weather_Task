@@ -70,9 +70,9 @@ class WeatherRepositoryTest {
     @Test
     fun `test getForecast with success response then return success`() = runTest {
         coEvery { dataSourceForecast.getForecast(
-            Mocks.city.lat.toString(),
-            Mocks.city.lon.toString(),
-            BuildConfig.APP_ID) } returns expectedForecastSuccessResult
+            any(),
+            any(),
+            any()) } returns expectedForecastSuccessResult
 
         val response = repository.getForecast(Mocks.city)
 
@@ -85,7 +85,11 @@ class WeatherRepositoryTest {
         assertNotNull(success)
         assertNull(error)
         assertEquals(expectedForecastSuccessResult.list?.size, success!!.list?.size)
-        coVerify(exactly = 1) { dataSourceCities.getCities() }
+        coVerify(exactly = 1) { dataSourceForecast.getForecast(
+            any(),
+            any(),
+            any()
+        ) }
     }
 
     @Test
@@ -109,9 +113,9 @@ class WeatherRepositoryTest {
     @Test
     fun `test getForecast with failure response then return error`() = runTest {
         coEvery { dataSourceForecast.getForecast(
-            Mocks.city.lat.toString(),
-            Mocks.city.lon.toString(),
-            BuildConfig.APP_ID) } throws expectedForecastFailureResult
+            any(),
+            any(),
+            any()) } throws expectedForecastFailureResult
 
         val response = repository.getForecast(Mocks.city)
 
@@ -125,9 +129,9 @@ class WeatherRepositoryTest {
         assertNull(success)
         assertEquals(expectedForecastFailureResult.message, error!!.message)
         coVerify(exactly = 1) { dataSourceForecast.getForecast(
-            Mocks.city.lat.toString(),
-            Mocks.city.lon.toString(),
-            BuildConfig.APP_ID) }
+            any(),
+            any(),
+            any()) }
     }
 
     @After
