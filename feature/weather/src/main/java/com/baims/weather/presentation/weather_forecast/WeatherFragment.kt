@@ -1,9 +1,16 @@
 package com.baims.weather.presentation.weather_forecast
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.widget.ArrayAdapter
 import androidx.fragment.app.viewModels
 import com.baims.feature.weather.R
 import com.baims.feature.weather.databinding.FragmentWeatherBinding
+import com.baims.network.data.errors.getMessage
+import com.baims.network.data.errors.getType
 import com.baims.ui.extensions.hide
 import com.baims.ui.extensions.show
 import com.baims.ui.presentation.BaseFragment
@@ -37,6 +44,9 @@ class WeatherFragment : BaseFragment<FragmentWeatherBinding>(FragmentWeatherBind
     }
 
     private fun initUI() {
+        if (!isInternetAvailable(requireContext())) {
+            showMessage("these data may not accurate")
+        }
         binding.forecastRV.adapter = adapter
         viewModel.getCities()
         binding.searchButton.setOnClickListener {
@@ -53,14 +63,22 @@ class WeatherFragment : BaseFragment<FragmentWeatherBinding>(FragmentWeatherBind
                 is DataState.Success -> {
                     hideLoading()
                     initCities(it.data.cities)
+                    showRv()
+
                 }
 
                 is DataState.Failure -> {
                     hideLoading()
-                    //showMessage(it.throwable.getType().getMessage().text ?: "")
+                    showMessage(
+                        it.throwable.getType().getMessage().text ?: "couldn't fetch data, try again"
+                    )
+                    hideRv()
+
                 }
 
                 DataState.Loading -> showLoading()
+
+                DataState.None -> {}
             }
         }
         collect(viewModel.forecastDataState) {
@@ -68,14 +86,20 @@ class WeatherFragment : BaseFragment<FragmentWeatherBinding>(FragmentWeatherBind
                 is DataState.Success -> {
                     hideLoading()
                     adapter.submitList(it.data.list)
+                    showRv()
                 }
 
                 is DataState.Failure -> {
                     hideLoading()
-                    // showMessage(it.throwable.getType().getMessage().text ?: "")
+                    showMessage(
+                        it.throwable.getType().getMessage().text ?: "couldn't fetch data, try again"
+                    )
+                    hideRv()
                 }
 
                 DataState.Loading -> showLoading()
+
+                DataState.None -> {}
             }
         }
     }
@@ -109,17 +133,48 @@ class WeatherFragment : BaseFragment<FragmentWeatherBinding>(FragmentWeatherBind
 
     private fun hideLoading() {
         binding.loadingLayout.loading.hide()
-        // binding.forecastRV.show()
     }
 
     private fun showLoading() {
         binding.loadingLayout.loading.show()
-        // binding.forecastRV.hide()
     }
 
+    private fun showRv(){
+        binding.textViewCouldNotFetch.hide()
+        binding.tryAgainButton.hide()
+        binding.forecastRV.show()
+    }
+
+    private fun hideRv(){
+        binding.textViewCouldNotFetch.show()
+        binding.tryAgainButton.show()
+        binding.forecastRV.hide()
+    }
     private fun testTags() {
         binding.forecastLayout.testTag(TestTags.ForecastFragment.LAYOUT)
         binding.forecastRV.testTag(TestTags.ForecastFragment.RV)
+    }
+
+    private fun isInternetAvailable(context: Context): Boolean {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
+        if (connectivityManager != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                val network: Network? = connectivityManager.activeNetwork
+                if (network != null) {
+                    val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
+                    return networkCapabilities != null &&
+                            (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                                    networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+                                    networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET))
+                }
+            } else {
+                // For devices below Android M
+                val activeNetworkInfo = connectivityManager.activeNetworkInfo
+                return activeNetworkInfo != null && activeNetworkInfo.isConnected
+            }
+        }
+        return false
     }
 
     override fun getLayoutResId(): Int = R.layout.fragment_weather

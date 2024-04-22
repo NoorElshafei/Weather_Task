@@ -61,6 +61,29 @@
         tools:itemCount="2"
         tools:listitem="@layout/item_forecast" />
 
+    <TextView
+        android:id="@+id/textView_could_not_fetch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="couldn't fetch data"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layoutDropDown" />
+
+    <Button
+        android:id="@+id/tryAgainButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="@string/try_again"
+        android:textSize="13sp"
+        android:visibility="gone"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_could_not_fetch" />
     <include
         android:id="@+id/loadingLayout"
         layout="@layout/loading_layout" />

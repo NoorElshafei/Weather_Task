@@ -69,8 +69,8 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     kapt(libs.hiltDaggerCompiler)
 
-    //androidTestImplementation(libs.bundles.uiTest)
-    //androidTestImplementation(project(Modules.Core.uiTest))
+    androidTestImplementation(libs.bundles.uiTest)
+    androidTestImplementation(project(Modules.Core.uiTest))
 
     implementation(project(Modules.Features.weather))
     implementation(project(Modules.Core.ui))

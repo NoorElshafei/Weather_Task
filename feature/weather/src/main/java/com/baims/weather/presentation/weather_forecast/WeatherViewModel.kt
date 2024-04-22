@@ -16,6 +16,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -29,7 +30,7 @@ class WeatherViewModel @Inject constructor(
     val citiesDataState: StateFlow<DataState<CitiesResponse>> get() = _citiesDataState
 
     private val _forecastDataState: MutableStateFlow<DataState<ForecastResponse>> =
-        MutableStateFlow(DataState.Loading)
+        MutableStateFlow(DataState.None)
     val forecastDataState: StateFlow<DataState<ForecastResponse>> get() = _forecastDataState
 
     private val validationForecastLiveData = MutableLiveData<Int>()
@@ -47,6 +48,7 @@ class WeatherViewModel @Inject constructor(
         if (validateForecast(city)) {
             viewModelScope.launch {
                 forecastUseCase.getForecast(city)
+                    .onStart { _forecastDataState.emit(DataState.Loading) }
                     .catchError { _forecastDataState.emit(DataState.Failure(it)) }
                     .collect { _forecastDataState.emit(DataState.Success(it)) }
             }
