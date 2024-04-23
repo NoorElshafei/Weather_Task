@@ -153,6 +153,9 @@ class WeatherFragment : BaseFragment<FragmentWeatherBinding>(FragmentWeatherBind
     private fun testTags() {
         binding.forecastLayout.testTag(TestTags.ForecastFragment.LAYOUT)
         binding.forecastRV.testTag(TestTags.ForecastFragment.RV)
+        binding.layoutDropDown.testTag(TestTags.ForecastFragment.DROPDOWN)
+        binding.autoCompleteTextView.testTag(TestTags.ForecastFragment.AUTO_COMPLETE)
+        binding.searchButton.testTag(TestTags.ForecastFragment.SEARCH)
     }
 
     private fun isInternetAvailable(context: Context): Boolean {
